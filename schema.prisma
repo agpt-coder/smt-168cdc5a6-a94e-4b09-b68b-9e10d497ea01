@@ -1,0 +1,150 @@
+// datasource db defines the database connection settings.
+// It is configured for PostgreSQL and uses an environment variable for the connection URL.
+// The 'extensions' feature enables the use of PostgreSQL-specific data types.
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+}
+
+// generator db configures Prisma Client settings.
+// It is set up to use Prisma Client Python with asyncio interface and specific features.
+generator db {
+  provider                    = "prisma-client-py"
+  interface                   = "asyncio"
+  recursive_type_depth        = 5
+  previewFeatures             = ["postgresqlExtensions"]
+  enable_experimental_decimal = true
+}
+
+model User {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  email     String   @unique
+  password  String
+  role      Role     @default(OPERATOR)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  CustomerContacts  CustomerContact[]
+  MaintenanceLogs   MaintenanceLog[]
+  ProductionRecords ProductionRecord[]
+  Reports           Report[]
+}
+
+model CustomerContact {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  userId    String
+  name      String
+  address   String?
+  phone     String   @unique
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  User User @relation(fields: [userId], references: [id])
+
+  Quotes   Quote[]
+  Invoices Invoice[]
+}
+
+model Quote {
+  id                String          @id @default(dbgenerated("gen_random_uuid()"))
+  customerContactId String
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  priceEstimate     PriceEstimate[]
+
+  CustomerContact CustomerContact @relation(fields: [customerContactId], references: [id])
+}
+
+model PriceEstimate {
+  id               String   @id @default(dbgenerated("gen_random_uuid()"))
+  lumberDimensions Json
+  lumberGrade      String
+  quantity         Int
+  priceRate        Float
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  expectedProfit   Float
+  quoteId          String
+
+  Quote Quote @relation(fields: [quoteId], references: [id])
+}
+
+model Invoice {
+  id                String   @id @default(dbgenerated("gen_random_uuid()"))
+  customerContactId String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  issueDate         DateTime
+  dueDate           DateTime
+  totalAmount       Float
+
+  CustomerContact CustomerContact @relation(fields: [customerContactId], references: [id])
+}
+
+model RawMaterial {
+  id               String             @id @default(dbgenerated("gen_random_uuid()"))
+  type             String
+  quantity         Int
+  unit             String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  ProductionRecord ProductionRecord[]
+}
+
+model FinishedProduct {
+  id               String             @id @default(dbgenerated("gen_random_uuid()"))
+  type             String
+  quantity         Int
+  unit             String
+  grade            String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  ProductionRecord ProductionRecord[]
+}
+
+model ProductionRecord {
+  id                String   @id @default(dbgenerated("gen_random_uuid()"))
+  userId            String
+  rawMaterialId     String
+  finishedProductId String
+  quantityProduced  Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  User            User            @relation(fields: [userId], references: [id])
+  RawMaterial     RawMaterial     @relation(fields: [rawMaterialId], references: [id])
+  FinishedProduct FinishedProduct @relation(fields: [finishedProductId], references: [id])
+}
+
+model MaintenanceLog {
+  id          String   @id @default(dbgenerated("gen_random_uuid()"))
+  userId      String
+  description String
+  date        DateTime
+  nextDueDate DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  User User @relation(fields: [userId], references: [id])
+}
+
+model Report {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  type      String
+  period    String
+  content   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+
+  User User @relation(fields: [userId], references: [id])
+}
+
+enum Role {
+  SYSTEM_ADMINISTRATOR
+  OPERATOR
+  SALES_MANAGER
+  MAINTENANCE_MANAGER
+}
+

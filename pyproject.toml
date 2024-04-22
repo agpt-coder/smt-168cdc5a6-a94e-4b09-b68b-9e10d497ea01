@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "smt-1"
+version = "0.1.0"
+description = "Small-Scale Sawmill Software Features:  1. Price Estimator:    - Input fields for lumber dimensions, grade, and quantity    - Automatic price calculation based on predefined rates    - Generate and display customer quotes  2. Cutting List Optimizer:    - Input fields for customer requirements (dimensions, quantities)    - Optimize cutting patterns to minimize waste and maximize yield    - Generate and display optimized cutting instructions for operators  3. Inventory Tracking:    - Track raw materials (logs) and finished products (lumber)    - Monitor and display stock levels  4. Production Recording:    - Record and store daily production quantities    - Track and store lumber dimensions and grades  5. Sales and Invoicing:    - Manage customer contacts    - Generate and store quotes and invoices  6. Basic Reporting:    - Generate and display production reports (volume, yield)    - Generate and display sales reports (revenue)  7. Maintenance Logging:    - Record and store equipment maintenance data    - Generate and display maintenance schedule reminders  8. User-Friendly Interface:    - Intuitive and easy-to-use user interface    - Minimal training required for operators  9. Data Backup and Recovery:    - Automatic data backup to prevent loss    - Simple data recovery process  Please develop a software solution that incorporates these features, focusing on simplicity, user-friendliness, and efficiency for small-scale sawmill operations. The Price Estimator and Cutting List Optimizer should be the primary quality-of-life features, while the remaining features address essential sawmill management needs. The software should be affordable, easy to implement, and require minimal technical expertise to use and maintain."
+authors = ["AutoGPT <info@agpt.co>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11"
+fastapi = "*"
+prisma = "*"
+pydantic = "*"
+uvicorn = "*"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
